@@ -95,8 +95,9 @@ export class Browser {
   }
 
   /** Upload files by clicking an element. */
-  async upload(selector: string, ...files: string[]): Promise<T.UploadResult> {
-    return this.exec<T.UploadResult>(['upload'], [selector, ...files]);
+  async upload(selector: string, ...files: string[]): Promise<number> {
+    const { uploaded } = await this.exec<{ uploaded: number; }>(['upload'], [selector, ...files]);
+    return uploaded;
   }
 
   /** Download a file by clicking an element. */
@@ -266,18 +267,59 @@ export class Browser {
 
   // -- Find Elements --
 
-  /**
-   * Find and interact with elements by semantic locator.
-   * @param locator - Locator strategy (role, text, label, placeholder, etc.).
-   * @param value - The locator value.
-   * @param action - Action to perform (click, fill, type, hover, focus, check, uncheck). Default: click.
-   * @param text - Optional text for text-based locators.
-   * @param options - Additional options (name, exact match).
-   */
-  async find(locator: T.LocatorStrategy, value: string, action: string, text?: string, options?: T.FindOptions): Promise<T.FindResult> {
-    const args = text !== undefined ? [locator, value, action, text] : [locator, value, action];
-    return this.exec<T.FindResult>(['find'], args, options as Record<string, unknown>);
-  }
+  /** Find and interact with elements by semantic locator. */
+  find: T.FindActions = {
+    /** Find by ARIA role (e.g. "button", "link", "heading") and perform action. Supports --name to filter by accessible name. */
+    role: async (value: string, action: T.FindAction, options?: T.FindOptions) => {
+      const { elements } = await this.exec<{ elements: T.FindElement[] }>(['find'], ['role', value, ...findActionToArgs(action)], options as Record<string, unknown>);
+      return elements;
+    },
+    /** Find by text content and perform action. Optionally provide text to type/fill. */
+    text: async (value: string, action: T.FindAction, options?: T.FindOptions) => {
+      const { elements } = await this.exec<{ elements: T.FindElement[] }>(['find'], ['text', value, ...findActionToArgs(action)], options as Record<string, unknown>);
+      return elements;
+    },
+    /** Find by aria-label and perform action. Optionally provide text to type/fill. */
+    label: async (value: string, action: T.FindAction, options?: T.FindOptions) => {
+      const { elements } = await this.exec<{ elements: T.FindElement[] }>(['find'], ['label', value, ...findActionToArgs(action)], options as Record<string, unknown>);
+      return elements;
+    },
+    /** Find by placeholder attribute and perform action. Optionally provide text to type/fill. */
+    placeholder: async (value: string, action: T.FindAction, options?: T.FindOptions) => {
+      const { elements } = await this.exec<{ elements: T.FindElement[] }>(['find'], ['placeholder', value, ...findActionToArgs(action)], options as Record<string, unknown>);
+      return elements;
+    },
+    /** Find by alt text and perform action. */
+    alt: async (value: string, action: T.FindAction, options?: T.FindOptions) => {
+      const { elements } = await this.exec<{ elements: T.FindElement[] }>(['find'], ['alt', value, ...findActionToArgs(action)], options as Record<string, unknown>);
+      return elements;
+    },
+    /** Find by title attribute and perform action. */
+    title: async (value: string, action: T.FindAction, options?: T.FindOptions) => {
+      const { elements } = await this.exec<{ elements: T.FindElement[] }>(['find'], ['title', value, ...findActionToArgs(action)], options as Record<string, unknown>);
+      return elements;
+    },
+    /** Find by data-testid attribute and perform action. */
+    testid: async (value: string, action: T.FindAction, options?: T.FindOptions) => {
+      const { elements } = await this.exec<{ elements: T.FindElement[] }>(['find'], ['testid', value, ...findActionToArgs(action)], options as Record<string, unknown>);
+      return elements;
+    },
+    /** Find first element matching a CSS selector and perform action. */
+    first: async (selector: string, action: T.FindAction, options?: T.FindOptions) => {
+      const { elements } = await this.exec<{ elements: T.FindElement[] }>(['find'], ['first', selector, ...findActionToArgs(action)], options as Record<string, unknown>);
+      return elements;
+    },
+    /** Find last element matching a CSS selector and perform action. */
+    last: async (selector: string, action: T.FindAction, options?: T.FindOptions) => {
+      const { elements } = await this.exec<{ elements: T.FindElement[] }>(['find'], ['last', selector, ...findActionToArgs(action)], options as Record<string, unknown>);
+      return elements;
+    },
+    /** Find nth element by index and CSS selector, then perform action. */
+    nth: async (index: number, selector: string, action: T.FindAction, options?: T.FindOptions) => {
+      const { elements } = await this.exec<{ elements: T.FindElement[] }>(['find'], ['nth', String(index), selector, ...findActionToArgs(action)], options as Record<string, unknown>);
+      return elements;
+    },
+  };
 
   // -- Mouse --
 
@@ -481,4 +523,13 @@ export class Browser {
   async batch(commands: string[], options?: T.BatchOptions): Promise<unknown> {
     return this.exec(['batch'], commands.map(c => `"${c}"`), options as Record<string, unknown>);
   }
+}
+
+function findActionToArgs(action: T.FindAction): string[] {
+  const record = action as Record<string, string>;
+  return ['kind', 'text'].reduce((args, key) => {
+    const value = record[key];
+    if (value) args.push(value);
+    return args;
+  }, [] as string[]);
 }

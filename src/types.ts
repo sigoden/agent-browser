@@ -83,6 +83,10 @@ export interface ClickOptions {
   newTab?: boolean;
 }
 
+/** Actions for find operation. */
+export type FindAction = { kind: 'click' } | { kind: 'fill'; text: string } | { kind: 'type'; text: string }
+  | { kind: 'hover' } | { kind: 'focus' } | { kind: 'check' } | { kind: 'uncheck' };
+
 /** Options for the `snapshot` command. */
 export interface SnapshotOptions {
   /** Only include interactive elements (-i) */
@@ -247,16 +251,12 @@ export interface NavigateResult { url: string; title: string; }
 
 export interface ClickResult { clicked: string; newTab?: boolean; url?: string; }
 export interface DragResult { dragged: boolean; source: string; target: string; }
-export interface UploadResult { uploaded: number; selector: string; }
 export type WaitResult = { waited: 'text'; text: string; } | { waited: 'selector'; selector: string; } | { waited: 'url'; url: string; } | { waited: 'function'; } | { waited: 'load'; state: string; } | { waited: 'timeout'; ms: number; };
 
 export interface ScreenshotResult { path: string; annotations?: ScreenshotAnnotation[]; }
 export interface SnapshotResult { snapshot: string; origin: string; refs: Record<string, { role: string; name: string; }>; }
 
-export interface CountResult { count: number; selector: string; }
 export interface BoxResult { x: number; y: number; width: number; height: number; }
-
-export interface FindResult { elements: FindElement[]; selector: string; }
 
 export interface ViewportResult { width: number; height: number; deviceScaleFactor: number; mobile: boolean; }
 export interface DeviceResult { device: string; width: number; height: number; deviceScaleFactor: number; mobile: boolean; }
@@ -302,6 +302,7 @@ export interface GetActions {
   /** Get the CDP endpoint URL for the active page. */
   cdpUrl(): Promise<string>;
 }
+
 export interface IsActions {
   /** Check if an element is visible. */
   visible(selector: string): Promise<boolean>;
@@ -310,6 +311,30 @@ export interface IsActions {
   /** Check if a checkbox/radio is checked. */
   checked(selector: string): Promise<boolean>;
 }
+
+export interface FindActions {
+  /** Find by ARIA role (e.g. "button", "link", "heading") and perform action. Supports --name to filter by accessible name. */
+  role(value: string, action: FindAction, options?: FindOptions): Promise<FindElement[]>;
+  /** Find by text content and perform action. Optionally provide text to type/fill. */
+  text(value: string, action: FindAction, options?: FindOptions): Promise<FindElement[]>;
+  /** Find by aria-label and perform action. Optionally provide text to type/fill. */
+  label(value: string, action: FindAction, options?: FindOptions): Promise<FindElement[]>;
+  /** Find by placeholder attribute and perform action. Optionally provide text to type/fill. */
+  placeholder(value: string, action: FindAction, options?: FindOptions): Promise<FindElement[]>;
+  /** Find by alt text and perform action. */
+  alt(value: string, action: FindAction, options?: FindOptions): Promise<FindElement[]>;
+  /** Find by title attribute and perform action. */
+  title(value: string, action: FindAction, options?: FindOptions): Promise<FindElement[]>;
+  /** Find by data-testid attribute and perform action. */
+  testid(value: string, action: FindAction, options?: FindOptions): Promise<FindElement[]>;
+  /** Find first element matching a CSS selector and perform action. */
+  first(value: string, action: FindAction, options?: FindOptions): Promise<FindElement[]>;
+  /** Find last element matching a CSS selector and perform action. */
+  last(value: string, action: FindAction, options?: FindOptions): Promise<FindElement[]>;
+  /** Find nth element by index and CSS selector, then perform action. */
+  nth(index: number, selector: string, action: FindAction, options?: FindOptions): Promise<FindElement[]>;
+}
+
 export interface MouseActions {
   /** Move the mouse to absolute coordinates (x, y). */
   move(x: number, y: number): Promise<boolean>;
@@ -320,6 +345,7 @@ export interface MouseActions {
   /** Scroll the mouse wheel. dy is vertical, dx is horizontal. */
   wheel(dy: number, dx?: number): Promise<WheelResult>;
 }
+
 export interface SetActions {
   /**
    * Set viewport size.
@@ -345,6 +371,7 @@ export interface SetActions {
    */
   media(colorScheme?: 'dark' | 'light', reducedMotion?: boolean): Promise<boolean>;
 }
+
 export interface NetworkActions {
   /** Intercept requests matching a URL pattern. */
   route(url: string, options?: NetworkRouteOptions): Promise<string>;
@@ -363,6 +390,7 @@ export interface CookieActions {
   /** Clear all cookies. */
   clear(): Promise<boolean>;
 }
+
 export interface StorageAreaActions {
   /** Get storage value(s). All keys when called without argument. */
   get(key?: string): Promise<StorageGetResult>;
@@ -371,12 +399,14 @@ export interface StorageAreaActions {
   /** Clear all storage. */
   clear(): Promise<boolean>;
 }
+
 export interface StorageActions {
   /** localStorage operations. */
   local: StorageAreaActions;
   /** sessionStorage operations. */
   session: StorageAreaActions;
 }
+
 export interface TabActions {
   /** List open tabs with their IDs and labels. */
   list(): Promise<TabInfo[]>;
@@ -387,6 +417,7 @@ export interface TabActions {
   /** Switch to a tab by ID or label. */
   switch(ref: string): Promise<TabSwitchResult>;
 }
+
 export interface DiffActions {
   /** Compare current snapshot to last snapshot or a baseline file. */
   snapshot(options?: DiffSnapshotOptions): Promise<DiffSnapshotResult>;
@@ -395,6 +426,7 @@ export interface DiffActions {
   /** Compare two pages by URL. */
   url(url1: string, url2: string, options?: DiffUrlOptions): Promise<DiffUrlResult>;
 }
+
 export interface KeyboardActions {
   /** Type text with real keystrokes (no selector needed). */
   type(text: string): Promise<string>;
