@@ -76,19 +76,6 @@ export interface BrowserOptions {
   headers?: string;
 }
 
-/** Options for the `goto` (open) command. Subset of BrowserOptions that apply per-navigation. */
-export interface OpenOptions {
-  /** Chrome profile name or directory path */
-  profile?: string;
-  /** Auto-save/restore cookies and localStorage by name */
-  sessionName?: string;
-  /** Load saved auth state from JSON file */
-  state?: string;
-  /** Auto-discover and connect to running Chrome */
-  autoConnect?: boolean;
-  /** HTTP headers scoped to this origin */
-  headers?: string;
-}
 
 /** Options for the `click` command. */
 export interface ClickOptions {
@@ -214,59 +201,12 @@ export interface DiffUrlOptions {
   depth?: number;
 }
 
-/** Options for `auth save` command. */
-export interface AuthSaveOptions {
-  /** Login page URL (required) */
-  url: string;
-  /** Username (required) */
-  username: string;
-  /** Password (required unless passwordStdin) */
-  password?: string;
-  /** Read password from stdin (recommended) */
-  passwordStdin?: boolean;
-  /** Custom CSS selector for username field */
-  usernameSelector?: string;
-  /** Custom CSS selector for password field */
-  passwordSelector?: string;
-  /** Custom CSS selector for submit button */
-  submitSelector?: string;
-}
-
-/** Options for `chat` command. */
-export interface ChatOptions {
-  /** AI model name (or AI_GATEWAY_MODEL env) */
-  model?: string;
-  /** Show tool commands and their raw output */
-  verbose?: boolean;
-  /** Show only AI text responses (hide tool calls) */
-  quiet?: boolean;
-}
 
 /** Options for `batch` command. */
 export interface BatchOptions {
   /** Stop on first error (--bail, default: continue all) */
   bail?: boolean;
 }
-
-/** Options for `dashboard start` command. */
-export interface DashboardOptions {
-  /** Dashboard server port (default: 4848) */
-  port?: number;
-}
-
-/** Options for `stream enable` command. */
-export interface StreamOptions {
-  /** WebSocket streaming port (default: OS-assigned) */
-  port?: number;
-}
-
-/** Options for `profiler start` command. */
-export interface ProfilerOptions {
-  /** Comma-separated trace categories (default includes devtools.timeline, v8.execute, blink) */
-  categories?: string;
-}
-
-/** Options for `find` command. */
 export interface FindOptions {
   /** Filter role by accessible name (--name) */
   name?: string;
@@ -280,9 +220,5 @@ export type ScrollDirection = 'up' | 'down' | 'left' | 'right';
 export type MouseButton = 'left' | 'right' | 'middle';
 /** Color scheme preference for `set media`. */
 export type ColorScheme = 'dark' | 'light';
-/** Web storage type: local or session. */
-export type StorageType = 'local' | 'session';
 /** Locator strategy for `find` command. */
 export type LocatorStrategy = 'role' | 'text' | 'label' | 'placeholder' | 'alt' | 'title' | 'testid' | 'first' | 'last' | 'nth';
-/** Clipboard operation for `clipboard` commands. */
-export type ClipboardOperation = 'read' | 'write' | 'copy' | 'paste';

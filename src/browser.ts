@@ -1,15 +1,12 @@
 import { delegate } from './delegate.js';
 import type {
-  BrowserOptions, OpenOptions, ClickOptions, SnapshotOptions,
+  BrowserOptions, ClickOptions, SnapshotOptions,
   ScreenshotOptions, NetworkRouteOptions, NetworkRequestsOptions,
   CookieSetOptions, TabNewOptions, DiffSnapshotOptions,
-  DiffScreenshotOptions, DiffUrlOptions, AuthSaveOptions,
-  ChatOptions, BatchOptions, DashboardOptions, StreamOptions,
-  ProfilerOptions, ScrollDirection, MouseButton, StorageType,
-  LocatorStrategy, FindOptions, ClipboardOperation,
+  DiffScreenshotOptions, DiffUrlOptions, BatchOptions,
+  ScrollDirection, MouseButton, LocatorStrategy,
+  FindOptions,
 } from './types.js';
-
-export { BrowserOptions, OpenOptions, ClickOptions, SnapshotOptions, ScreenshotOptions, NetworkRouteOptions, NetworkRequestsOptions, CookieSetOptions, TabNewOptions, DiffSnapshotOptions, DiffScreenshotOptions, DiffUrlOptions, AuthSaveOptions, ChatOptions, BatchOptions, DashboardOptions, StreamOptions, ProfilerOptions, ScrollDirection, MouseButton, StorageType, LocatorStrategy, FindOptions, ClipboardOperation };
 
 /**
  * Fast browser automation CLI wrapper.
@@ -34,8 +31,8 @@ export class Browser {
   // -- Core Commands --
 
   /** Navigate to a URL. */
-  async goto(url: string, options?: OpenOptions): Promise<void> {
-    await this.exec(['goto'], [url], options as Record<string, unknown>);
+  async goto(url: string): Promise<void> {
+    await this.exec(['goto'], [url]);
   }
 
   /** Click an element. */
@@ -388,81 +385,6 @@ export class Browser {
     insertText: (text: string) => this.exec(['keyboard', 'inserttext'], [text]),
   };
 
-  // -- Skills --
-
-  skills = {
-    /** List available skills. */
-    list: () => this.exec(['skills', 'list']),
-    /** Get a skill by name. Pass full=true for the full reference. */
-    get: (name: string, full?: boolean) =>
-      this.exec(['skills', 'get'], [name], full ? { full: true } : undefined),
-    /** Print the skill directory path. */
-    path: (name?: string) => {
-      const args = name ? [name] : [];
-      return this.exec(['skills', 'path'], args);
-    },
-  };
-
-  // -- Auth --
-
-  auth = {
-    /** Save credentials for a login profile. */
-    save: (name: string, options: AuthSaveOptions) =>
-      this.exec(['auth', 'save'], [name], { ...options }),
-    /** Login using saved credentials (waits for form fields). */
-    login: (name: string) => this.exec(['auth', 'login'], [name]),
-    /** List saved auth profiles. */
-    list: () => this.exec(['auth', 'list']),
-    /** Show auth profile metadata (no passwords). */
-    show: (name: string) => this.exec(['auth', 'show'], [name]),
-    /** Delete an auth profile. */
-    delete: (name: string) => this.exec(['auth', 'delete'], [name]),
-  };
-
-  // -- Trace --
-
-  trace = {
-    /** Start recording a Chrome DevTools trace. */
-    start: (path?: string) => {
-      const args = path ? ['start', path] : ['start'];
-      return this.exec(['trace', ...args]);
-    },
-    /** Stop tracing and save to file. */
-    stop: (path?: string) => {
-      const args = path ? ['stop', path] : ['stop'];
-      return this.exec(['trace', ...args]);
-    },
-  };
-
-  // -- Profiler --
-
-  profiler = {
-    /** Start profiling with optional trace categories. */
-    start: (options?: ProfilerOptions) =>
-      this.exec(['profiler', 'start'], [], options as Record<string, unknown>),
-    /** Stop profiling and save to file. */
-    stop: (path?: string) => {
-      const args = path ? ['stop', path] : ['stop'];
-      return this.exec(['profiler', ...args]);
-    },
-  };
-
-  // -- Record --
-
-  record = {
-    /** Start video recording (WebM) of the page. */
-    start: (path: string, url?: string) => {
-      const args = url ? ['start', path, url] : ['start', path];
-      return this.exec(['record', ...args]);
-    },
-    /** Stop video recording and save. */
-    stop: () => this.exec(['record', 'stop']),
-    /** Restart recording to a new file. */
-    restart: (path: string, url?: string) => {
-      const args = url ? ['restart', path, url] : ['restart', path];
-      return this.exec(['record', ...args]);
-    },
-  };
 
   // -- Debug --
 
@@ -483,54 +405,6 @@ export class Browser {
     await this.exec(['highlight'], [selector]);
   }
 
-  /** Open Chrome DevTools for the active page. */
-  async inspect(): Promise<void> {
-    await this.exec(['inspect']);
-  }
-
-  clipboard = {
-    /** Read text from the browser clipboard. */
-    read: () => this.exec(['clipboard', 'read']),
-    /** Write text to the browser clipboard. */
-    write: (text: string) => this.exec(['clipboard', 'write'], [text]),
-    /** Copy current selection (simulates Ctrl+C). */
-    copy: () => this.exec(['clipboard', 'copy']),
-    /** Paste from clipboard (simulates Ctrl+V). */
-    paste: () => this.exec(['clipboard', 'paste']),
-  };
-
-  // -- Stream --
-
-  stream = {
-    /** Start WebSocket streaming for this session. */
-    enable: (options?: StreamOptions) =>
-      this.exec(['stream', 'enable'], [], options as Record<string, unknown>),
-    /** Stop WebSocket streaming. */
-    disable: () => this.exec(['stream', 'disable']),
-    /** Show streaming status and active port. */
-    status: () => this.exec(['stream', 'status']),
-  };
-
-  // -- Chat --
-
-  chat = {
-    /** Send a natural language instruction (single-shot). */
-    send: (message: string, options?: ChatOptions) =>
-      this.exec(['chat'], [message], options as Record<string, unknown>),
-    /** Start interactive chat (REPL mode). */
-    interactive: (options?: ChatOptions) =>
-      this.exec(['chat'], [], options as Record<string, unknown>),
-  };
-
-  // -- Dashboard --
-
-  dashboard = {
-    /** Start the dashboard server. */
-    start: (options?: DashboardOptions) =>
-      this.exec(['dashboard', 'start'], [], options as Record<string, unknown>),
-    /** Stop the dashboard server. */
-    stop: () => this.exec(['dashboard', 'stop']),
-  };
 
   // -- Confirmation --
 
@@ -544,48 +418,11 @@ export class Browser {
     await this.exec(['deny'], [id]);
   }
 
-  // -- Session --
-
-  /** Show the current session name. */
-  async session(): Promise<string> {
-    return this.exec(['session']);
-  }
-
-  /** List active sessions. */
-  async sessionList(): Promise<string> {
-    return this.exec(['session', 'list']);
-  }
-
-  // -- Setup --
-
-  /** Install browser binaries. */
-  async install(withDeps?: boolean): Promise<void> {
-    const args = withDeps ? ['--with-deps'] : [];
-    await this.exec(['install'], args);
-  }
-
-  /** Upgrade agent-browser to the latest version. */
-  async upgrade(): Promise<void> {
-    await this.exec(['upgrade']);
-  }
-
-  /** Diagnose the installation; auto-clean stale files with fix=true. */
-  async doctor(fix?: boolean): Promise<void> {
-    const args = fix ? ['--fix'] : [];
-    await this.exec(['doctor'], args);
-  }
 
   // -- Batch --
 
   /** Execute multiple commands sequentially. */
   async batch(commands: string[], options?: BatchOptions): Promise<string> {
     return this.exec(['batch'], commands.map(c => `"${c}"`), options as Record<string, unknown>);
-  }
-
-  // -- Profiles --
-
-  /** List available Chrome profiles. */
-  async profiles(): Promise<string> {
-    return this.exec(['profiles']);
   }
 }
