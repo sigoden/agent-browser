@@ -25,7 +25,8 @@ export async function delegate(
   globalOptions: Record<string, unknown>,
   options?: Record<string, unknown>,
 ): Promise<string> {
-  const allArgs = ['agent-browser', ...toCliOptions(globalOptions), ...command, ...args, ...toCliOptions(options)];
+  const mergedOptions = { ...options, json: true };
+  const allArgs = ['agent-browser', ...toCliOptions(globalOptions), ...command, ...args, ...toCliOptions(mergedOptions)];
 
   return new Promise<string>((resolve, reject) => {
     const child = spawn('npx', allArgs, {

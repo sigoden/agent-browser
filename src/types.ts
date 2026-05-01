@@ -222,3 +222,297 @@ export type MouseButton = 'left' | 'right' | 'middle';
 export type ColorScheme = 'dark' | 'light';
 /** Locator strategy for `find` command. */
 export type LocatorStrategy = 'role' | 'text' | 'label' | 'placeholder' | 'alt' | 'title' | 'testid' | 'first' | 'last' | 'nth';
+
+// =========================================================================
+// Result types (based on agent-browser JSON responses)
+// =========================================================================
+
+export interface NavigateResult { url: string; title: string; }
+
+export interface ClickResult { clicked: string; newTab?: boolean; url?: string; }
+export interface DblclickResult { clicked: string; }
+export interface FillResult { filled: string; }
+export interface TypeResult { typed: string; }
+export interface PressResult { pressed: string; }
+export interface HoverResult { hovered: string; }
+export interface FocusResult { focused: string; }
+export interface CheckResult { checked: string; }
+export interface UncheckResult { unchecked: string; }
+export interface SelectResult { selected: string[]; }
+export interface DragResult { dragged: boolean; source: string; target: string; }
+export interface UploadResult { uploaded: number; selector: string; }
+export interface DownloadResult { path: string; }
+export interface ScrollResult { scrolled: boolean; }
+export interface ScrollIntoViewResult { scrolled: string; }
+export interface WaitResult { waited: string; text?: string; selector?: string; url?: string; ms?: number; state?: string; }
+
+export interface ScreenshotResult { path: string; annotations?: ScreenshotAnnotation[]; }
+export interface PdfResult { path: string; }
+export interface SnapshotResult { snapshot: string; origin: string; refs: Record<string, { role: string; name: string; }>; }
+export interface EvalResult { result: string; origin: string; }
+export interface CloseResult { closed: boolean; }
+
+export interface BackForwardResult { url: string; }
+
+export interface TextResult { text: string; origin: string; }
+export interface HtmlResult { html: string; }
+export interface InputValueResult { value: string; }
+export interface AttrResult { value: string; origin: string; }
+export interface TitleResult { title: string; }
+export interface UrlResult { url: string; }
+export interface CountResult { count: number; selector: string; }
+export interface BoxResult { x: number; y: number; width: number; height: number; }
+export interface StylesResult { styles: Record<string, string>; }
+export interface CdpUrlResult { cdpUrl: string; }
+
+export interface VisibleResult { visible: boolean; origin: string; }
+export interface EnabledResult { enabled: boolean; origin: string; }
+export interface CheckedResult { checked: boolean; origin: string; }
+
+export interface FindResult { elements: FindElement[]; selector: string; }
+export interface EvalHandleResult { handle: string; }
+
+export interface ViewportResult { width: number; height: number; deviceScaleFactor: number; mobile: boolean; }
+export interface DeviceResult { device: string; width: number; height: number; deviceScaleFactor: number; mobile: boolean; }
+export interface GeoResult { latitude: number; longitude: number; }
+export interface OfflineResult { offline: boolean; }
+export interface SetResult { set: boolean; }
+export interface ClearResult { cleared: boolean; }
+
+export interface RouteResult { routed: string; }
+export interface UnrouteResult { unrouted: string; }
+export interface RequestsClearResult { cleared: boolean; }
+export interface HarStartResult { started: boolean; }
+export interface HarStopResult { path: string; requestCount: number; }
+
+export interface CookiesGetResult { cookies: Cookie[]; }
+export interface CookiesSetResult { set: boolean; }
+export interface CookiesClearResult { cleared: boolean; }
+export interface StorageGetResult { [key: string]: unknown; }
+export interface StorageSetResult { set: boolean; }
+export interface StorageClearResult { cleared: boolean; }
+
+export interface TabListResult { tabs: TabInfo[]; }
+export interface TabNewResult { tabId: string; url?: string; }
+export interface TabSwitchResult { [key: string]: unknown; }
+export interface TabCloseResult { [key: string]: unknown; }
+
+export interface DiffSnapshotResult { diff: string; additions: number; removals: number; unchanged: number; changed: number; }
+export interface DiffScreenshotResult { match: boolean; mismatchPercentage: number; totalPixels: number; differentPixels: number; diffPath?: string; dimensionMismatch?: unknown; }
+export interface DiffUrlResult { diff: string; url1: string; url2: string; snapshot1: string; snapshot2: string; }
+
+export interface KeyboardTypeResult { typed: string; }
+export interface InsertTextResult { inserted: boolean; }
+export interface MouseMoveResult { moved: boolean; }
+export type MouseButtonResult = { pressed: boolean; } | { released: boolean; }
+export interface WheelResult { scrolled: boolean; deltaX: number; deltaY: number; }
+
+export interface HighlightResult { highlighted: string; }
+export interface ConfirmResult { confirmed: boolean; action: string; }
+export interface DenyResult { denied: boolean; action: string; }
+export interface DialogStatusResult { hasDialog: boolean; type?: string; message?: string; defaultPrompt?: string; }
+export interface DialogHandleResult { handled: boolean; accepted: boolean; }
+
+export interface FrameResult { frame: string; }
+export interface BringToFrontResult { broughtToFront: boolean; }
+
+export interface ConsoleClearResult { cleared: boolean; }
+export interface ErrorsResult { errors: ErrorEntry[]; }
+
+export interface StreamStatusResult { enabled: boolean; port: number | null; connected: boolean; screencasting: boolean; }
+export interface StreamDisableResult { disabled: boolean; }
+
+// Sub-object action types (with reserved-word-friendly keys)
+
+export interface GetActions {
+  /** Get text content of an element. */
+  text(selector: string): Promise<TextResult>;
+  /** Get inner HTML of an element. */
+  html(selector: string): Promise<HtmlResult>;
+  /** Get value of an input element. */
+  value(selector: string): Promise<InputValueResult>;
+  /** Get an attribute value from an element. */
+  attr(selector: string, name: string): Promise<AttrResult>;
+  /** Get the page title. */
+  title(): Promise<TitleResult>;
+  /** Get the current page URL. */
+  url(): Promise<UrlResult>;
+  /** Get the number of elements matching a selector. */
+  count(selector: string): Promise<CountResult>;
+  /** Get the bounding box of an element (x, y, width, height). */
+  box(selector: string): Promise<BoxResult>;
+  /** Get computed styles of an element. */
+  styles(selector: string): Promise<StylesResult>;
+  /** Get the CDP endpoint URL for the active page. */
+  cdpUrl(): Promise<CdpUrlResult>;
+}
+export interface IsActions {
+  /** Check if an element is visible. */
+  visible(selector: string): Promise<VisibleResult>;
+  /** Check if an element is enabled (not disabled). */
+  enabled(selector: string): Promise<EnabledResult>;
+  /** Check if a checkbox/radio is checked. */
+  checked(selector: string): Promise<CheckedResult>;
+}
+export interface MouseActions {
+  /** Move the mouse to absolute coordinates (x, y). */
+  move(x: number, y: number): Promise<MouseMoveResult>;
+  /** Press a mouse button (left, right, middle). */
+  down(button?: MouseButton): Promise<MouseButtonResult>;
+  /** Release a mouse button (left, right, middle). */
+  up(button?: MouseButton): Promise<MouseButtonResult>;
+  /** Scroll the mouse wheel. dy is vertical, dx is horizontal. */
+  wheel(dy: number, dx?: number): Promise<WheelResult>;
+}
+export interface SetActions {
+  /**
+   * Set viewport size.
+   * @param w - Viewport width in pixels.
+   * @param h - Viewport height in pixels.
+   * @param scale - Device scale factor (e.g. 2 for retina).
+   */
+  viewport(w: number, h: number, scale?: number): Promise<ViewportResult>;
+  /** Emulate a device (e.g. "iPhone 12"). */
+  device(name: string): Promise<DeviceResult>;
+  /** Set geolocation coordinates. */
+  geo(lat: number, lng: number): Promise<GeoResult>;
+  /** Toggle offline mode. */
+  offline(on?: boolean): Promise<OfflineResult>;
+  /** Set extra HTTP headers for all requests. */
+  headers(json: string): Promise<SetResult>;
+  /** Set HTTP basic authentication credentials. */
+  credentials(user: string, pass: string): Promise<SetResult>;
+  /**
+   * Set color scheme and reduced motion preference.
+   * @param colorScheme - "dark" or "light".
+   * @param reducedMotion - Enable reduced motion when true.
+   */
+  media(colorScheme?: 'dark' | 'light', reducedMotion?: boolean): Promise<SetResult>;
+}
+export interface NetworkActions {
+  /** Intercept requests matching a URL pattern. */
+  route(url: string, options?: NetworkRouteOptions): Promise<RouteResult>;
+  /** Remove a route interceptor (all if no URL given). */
+  unroute(url?: string): Promise<UnrouteResult>;
+  /** List captured network requests, with optional filters (clear, filter, type, method, status). */
+  requests(options?: NetworkRequestsOptions): Promise<TrackedRequest[]>;
+  /** View full request/response detail (including body) by request ID. */
+  request(requestId: string): Promise<unknown>;
+  /** Record and export a HAR file (start/stop). */
+  har(action: 'start' | 'stop', path?: string): Promise<unknown>;
+}
+export interface CookieActions {
+  /** Get all cookies. */
+  get(): Promise<CookiesGetResult>;
+  /** Set a cookie with optional advanced options. */
+  set(name: string, value: string, options?: CookieSetOptions): Promise<SetResult>;
+  /** Clear all cookies. */
+  clear(): Promise<CookiesClearResult>;
+}
+export interface StorageAreaActions {
+  /** Get storage value(s). All keys when called without argument. */
+  get(key?: string): Promise<StorageGetResult>;
+  /** Set a storage item. */
+  set(key: string, value: string): Promise<StorageSetResult>;
+  /** Clear all storage. */
+  clear(): Promise<StorageClearResult>;
+}
+export interface StorageActions {
+  /** localStorage operations. */
+  local: StorageAreaActions;
+  /** sessionStorage operations. */
+  session: StorageAreaActions;
+}
+export interface TabActions {
+  /** List open tabs with their IDs and labels. */
+  list(): Promise<TabListResult>;
+  /** Open a new tab, optionally with a URL and label. */
+  'new'(url?: string, options?: TabNewOptions): Promise<TabNewResult>;
+  /** Close a tab by ref or label (current tab if no ref). */
+  close(ref?: string): Promise<TabCloseResult>;
+  /** Switch to a tab by ID or label. */
+  switch(ref: string): Promise<TabSwitchResult>;
+}
+export interface DiffActions {
+  /** Compare current snapshot to last snapshot or a baseline file. */
+  snapshot(options?: DiffSnapshotOptions): Promise<DiffSnapshotResult>;
+  /** Visual pixel diff against a baseline image. */
+  screenshot(options: DiffScreenshotOptions): Promise<DiffScreenshotResult>;
+  /** Compare two pages by URL. */
+  url(url1: string, url2: string, options?: DiffUrlOptions): Promise<DiffUrlResult>;
+}
+export interface KeyboardActions {
+  /** Type text with real keystrokes (no selector needed). */
+  type(text: string): Promise<KeyboardTypeResult>;
+  /** Insert text without firing key events (like paste). */
+  insertText(text: string): Promise<InsertTextResult>;
+}
+
+
+// =========================================================================
+// Sub-types used in result types
+// =========================================================================
+
+export interface TabInfo {
+  tabId: string;
+  label: string;
+  title: string;
+  url: string;
+  type: string;
+  active: boolean;
+}
+
+export interface AnnotationBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface ScreenshotAnnotation {
+  refId: string;
+  number: number;
+  role: string;
+  name?: string;
+  box: AnnotationBox;
+}
+
+export interface FindElement {
+  index: number;
+  tagName: string;
+  text: string;
+  visible: boolean;
+}
+
+export interface Cookie {
+  name: string;
+  value: string;
+  domain: string;
+  path: string;
+  expires: number;
+  size: number;
+  httpOnly: boolean;
+  secure: boolean;
+  session: boolean;
+  sameSite?: string;
+}
+
+export interface ErrorEntry {
+  text: string;
+  url: string;
+  line: number;
+  column: number;
+}
+
+export interface TrackedRequest {
+  url: string;
+  method: string;
+  headers: Record<string, unknown>;
+  timestamp: number;
+  resourceType: string;
+  requestId: string;
+  postData?: string;
+  status?: number;
+  responseHeaders?: Record<string, unknown>;
+  mimeType?: string;
+}
