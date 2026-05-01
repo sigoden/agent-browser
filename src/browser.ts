@@ -118,10 +118,34 @@ export class Browser {
     return scrolled;
   }
 
-  // TODO wait arguments
-  /** Wait for an element or a timeout in milliseconds. */
-  async wait(selectorOrMs: string | number): Promise<T.WaitResult> {
-    return this.exec<T.WaitResult>(['wait'], [String(selectorOrMs)]);
+  /**
+   * Wait for an element, text, URL, load state, JS expression, or a timeout.
+   *
+   * Examples:
+   *   browser.wait("#loading-spinner")
+   *   browser.wait(2000)
+   *   browser.wait({ url: "https://www.example.com/" })
+   *   browser.wait({ load: "networkidle" })
+   *   browser.wait({ fn: "window.appReady === true" })
+   *   browser.wait({ text: "Welcome back" })
+   */
+  async wait(selectorOrMs?: string | number | T.WaitOptions): Promise<T.WaitResult> {
+    const args: string[] = [];
+    let opts: Record<string, unknown> = {};
+
+    if (typeof selectorOrMs === 'object') {
+      if (Object.keys(selectorOrMs).length === 1 && 'timeout' in selectorOrMs) {
+        args.push(String(selectorOrMs.timeout));
+      } else {
+        opts = selectorOrMs as Record<string, unknown>;
+      }
+    } else {
+      if (selectorOrMs !== undefined) {
+        args.push(String(selectorOrMs));
+      }
+    }
+
+    return this.exec<T.WaitResult>(['wait'], args, opts);
   }
 
   /** Take a screenshot. Returns the path to the saved image. */

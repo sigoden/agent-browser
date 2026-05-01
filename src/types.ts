@@ -214,6 +214,22 @@ export interface FindOptions {
   exact?: boolean;
 }
 
+/** Options for `wait` command. */
+export interface WaitOptions {
+  /** Timeout in milliseconds */
+  timeout?: number;
+  /** URL pattern to wait for */
+  url?: string;
+  /** Page load state: load, domcontentloaded, networkidle */
+  load?: 'load' | 'domcontentloaded' | 'networkidle';
+  /** JavaScript expression to wait for (truthy) */
+  fn?: string;
+  /** Wait for text to appear on page (substring match) */
+  text?: string;
+  /** Element state: visible, hidden, detached (default: visible) */
+  state?: 'visible' | 'hidden' | 'detached';
+}
+
 /** Scroll direction for the `scroll` command. */
 export type ScrollDirection = 'up' | 'down' | 'left' | 'right';
 /** Mouse button for mouse down/up. */
@@ -232,7 +248,7 @@ export interface NavigateResult { url: string; title: string; }
 export interface ClickResult { clicked: string; newTab?: boolean; url?: string; }
 export interface DragResult { dragged: boolean; source: string; target: string; }
 export interface UploadResult { uploaded: number; selector: string; }
-export interface WaitResult { waited: string; text?: string; selector?: string; url?: string; ms?: number; state?: string; }
+export type WaitResult = { waited: 'text'; text: string; } | { waited: 'selector'; selector: string; } | { waited: 'url'; url: string; } | { waited: 'function'; } | { waited: 'load'; state: string; } | { waited: 'timeout'; ms: number; };
 
 export interface ScreenshotResult { path: string; annotations?: ScreenshotAnnotation[]; }
 export interface SnapshotResult { snapshot: string; origin: string; refs: Record<string, { role: string; name: string; }>; }
