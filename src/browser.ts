@@ -1,5 +1,5 @@
 import { delegate } from './delegate.js';
-import type * as T from './types.js';
+import * as T from './types.js';
 
 /**
  * Fast browser automation CLI wrapper.
@@ -36,48 +36,57 @@ export class Browser {
   }
 
   /** Double-click an element. */
-  async dblclick(selector: string): Promise<T.DblclickResult> {
-    return this.exec<T.DblclickResult>(['dblclick'], [selector]);
+  async dblclick(selector: string): Promise<string> {
+    const { clicked } = await this.exec<{ clicked: string }>(['dblclick'], [selector]);
+    return clicked;
   }
 
   /** Type text into an element. */
-  async type(selector: string, text: string): Promise<T.TypeResult> {
-    return this.exec<T.TypeResult>(['type'], [selector, text]);
+  async type(selector: string, text: string): Promise<string> {
+    const { typed } = await this.exec<{ typed: string }>(['type'], [selector, text]);
+    return typed;
   }
 
   /** Clear and fill an input element. */
-  async fill(selector: string, text: string): Promise<T.FillResult> {
-    return this.exec<T.FillResult>(['fill'], [selector, text]);
+  async fill(selector: string, text: string): Promise<string> {
+    const { filled } = await this.exec<{ filled: string }>(['fill'], [selector, text]);
+    return filled;
   }
 
   /** Press a key (Enter, Tab, Control+a, etc.). */
-  async press(key: string): Promise<T.PressResult> {
-    return this.exec<T.PressResult>(['press'], [key]);
+  async press(key: string): Promise<string> {
+    const { pressed } = await this.exec<{ pressed: string }>(['press'], [key]);
+    return pressed;
   }
 
   /** Hover over an element. */
-  async hover(selector: string): Promise<T.HoverResult> {
-    return this.exec<T.HoverResult>(['hover'], [selector]);
+  async hover(selector: string): Promise<string> {
+    const { hovered } = await this.exec<{ hovered: string }>(['hover'], [selector]);
+    return hovered;
   }
 
   /** Focus an element. */
-  async focus(selector: string): Promise<T.FocusResult> {
-    return this.exec<T.FocusResult>(['focus'], [selector]);
+  async focus(selector: string): Promise<string> {
+    const { focused } = await this.exec<{ focused: string }>(['focus'], [selector]);
+    return focused;
   }
 
   /** Check a checkbox. */
-  async check(selector: string): Promise<T.CheckResult> {
-    return this.exec<T.CheckResult>(['check'], [selector]);
+  async check(selector: string): Promise<string> {
+    const { checked } = await this.exec<{ checked: string }>(['check'], [selector]);
+    return checked;
   }
 
   /** Uncheck a checkbox. */
-  async uncheck(selector: string): Promise<T.UncheckResult> {
-    return this.exec<T.UncheckResult>(['uncheck'], [selector]);
+  async uncheck(selector: string): Promise<string> {
+    const { unchecked } = await this.exec<{ unchecked: string }>(['uncheck'], [selector]);
+    return unchecked;
   }
 
   /** Select dropdown option(s). */
-  async select(selector: string, ...values: string[]): Promise<T.SelectResult> {
-    return this.exec<T.SelectResult>(['select'], [selector, ...values]);
+  async select(selector: string, ...values: string[]): Promise<string[]> {
+    const { selected } = await this.exec<{ selected: string[] }>(['select'], [selector, ...values]);
+    return selected;
   }
 
   /** Drag and drop from source to target element. */
@@ -91,21 +100,25 @@ export class Browser {
   }
 
   /** Download a file by clicking an element. */
-  async download(selector: string, path: string): Promise<T.DownloadResult> {
-    return this.exec<T.DownloadResult>(['download'], [selector, path]);
+  async download(selector: string, path: string): Promise<string> {
+    const { path: filePath } = await this.exec<{ path: string }>(['download'], [selector, path]);
+    return filePath;
   }
 
   /** Scroll the page (up/down/left/right). */
-  async scroll(direction: T.ScrollDirection, pixels?: number): Promise<T.ScrollResult> {
+  async scroll(direction: T.ScrollDirection, pixels?: number): Promise<boolean> {
     const args = pixels !== undefined ? [direction, String(pixels)] : [direction];
-    return this.exec<T.ScrollResult>(['scroll'], args);
+    const { scrolled } = await this.exec<{ scrolled: boolean }>(['scroll'], args);
+    return scrolled;
   }
 
   /** Scroll an element into view. */
-  async scrollIntoView(selector: string): Promise<T.ScrollIntoViewResult> {
-    return this.exec<T.ScrollIntoViewResult>(['scrollintoview'], [selector]);
+  async scrollIntoView(selector: string): Promise<string> {
+    const { scrolled } = await this.exec<{ scrolled: string }>(['scrollintoview'], [selector]);
+    return scrolled;
   }
 
+  // TODO wait arguments
   /** Wait for an element or a timeout in milliseconds. */
   async wait(selectorOrMs: string | number): Promise<T.WaitResult> {
     return this.exec<T.WaitResult>(['wait'], [String(selectorOrMs)]);
@@ -118,8 +131,9 @@ export class Browser {
   }
 
   /** Save the page as PDF. */
-  async pdf(path: string): Promise<T.PdfResult> {
-    return this.exec<T.PdfResult>(['pdf'], [path]);
+  async pdf(path: string): Promise<string> {
+    const { path: pdfPath } = await this.exec<{ path: string }>(['pdf'], [path]);
+    return pdfPath;
   }
 
   /** Get the accessibility tree snapshot with element refs (for AI). */
@@ -128,8 +142,9 @@ export class Browser {
   }
 
   /** Execute JavaScript in the page context. */
-  async eval(js: string): Promise<T.EvalResult> {
-    return this.exec<T.EvalResult>(['eval'], [js]);
+  async eval(js: string): Promise<unknown> {
+    const { result } = await this.exec<{ result: unknown }>(['eval'], [js]);
+    return result;
   }
 
   /** Connect to a browser via CDP port or URL. */
@@ -141,48 +156,88 @@ export class Browser {
    * Close the browser.
    * @param all - Close every session when true.
    */
-  async close(all?: boolean): Promise<T.CloseResult> {
-    return this.exec<T.CloseResult>(['close'], [], all ? { all: true } : undefined);
+  async close(all?: boolean): Promise<boolean> {
+    const { closed } = await this.exec<{ closed: boolean }>(['close'], [], all ? { all: true } : undefined);
+    return closed;
   }
 
   // -- Navigation --
 
   /** Go back in history. */
-  async back(): Promise<T.BackForwardResult> {
-    return this.exec<T.BackForwardResult>(['back']);
+  async back(): Promise<string> {
+    const { url } = await this.exec<{ url: string }>(['back']);
+    return url;
   }
 
   /** Go forward in history. */
-  async forward(): Promise<T.BackForwardResult> {
-    return this.exec<T.BackForwardResult>(['forward']);
+  async forward(): Promise<string> {
+    const { url } = await this.exec<{ url: string }>(['forward']);
+    return url;
   }
 
   /** Reload the current page. */
-  async reload(): Promise<T.BackForwardResult> {
-    return this.exec<T.BackForwardResult>(['reload']);
+  async reload(): Promise<string> {
+    const { url } = await this.exec<{ url: string }>(['reload']);
+    return url;
   }
 
   // -- Get Info --
 
   get: T.GetActions = {
-    text: (selector: string) => this.exec<T.TextResult>(['get', 'text'], [selector]),
-    html: (selector: string) => this.exec<T.HtmlResult>(['get', 'html'], [selector]),
-    value: (selector: string) => this.exec<T.InputValueResult>(['get', 'value'], [selector]),
-    attr: (selector: string, name: string) => this.exec<T.AttrResult>(['get', 'attr'], [selector, name]),
-    title: () => this.exec<T.TitleResult>(['get', 'title']),
-    url: () => this.exec<T.UrlResult>(['get', 'url']),
-    count: (selector: string) => this.exec<T.CountResult>(['get', 'count'], [selector]),
+    text: async (selector: string) => {
+      const { text } = await this.exec<{ text: string; origin: string }>(['get', 'text'], [selector]);
+      return text;
+    },
+    html: async (selector: string) => {
+      const { html } = await this.exec<{ html: string }>(['get', 'html'], [selector]);
+      return html;
+    },
+    value: async (selector: string) => {
+      const { value } = await this.exec<{ value: string }>(['get', 'value'], [selector]);
+      return value;
+    },
+    attr: async (selector: string, name: string) => {
+      const { value } = await this.exec<{ value: string; origin: string }>(['get', 'attr'], [selector, name]);
+      return value;
+    },
+    title: async () => {
+      const { title } = await this.exec<{ title: string }>(['get', 'title']);
+      return title;
+    },
+    url: async () => {
+      const { url } = await this.exec<{ url: string }>(['get', 'url']);
+      return url;
+    },
+    count: async (selector: string) => {
+      const { count } = await this.exec<{ count: number }>(['get', 'count'], [selector]);
+      return count;
+    },
     box: (selector: string) => this.exec<T.BoxResult>(['get', 'box'], [selector]),
-    styles: (selector: string) => this.exec<T.StylesResult>(['get', 'styles'], [selector]),
-    cdpUrl: () => this.exec<T.CdpUrlResult>(['get', 'cdp-url']),
+    styles: async (selector: string) => {
+      const { styles } = await this.exec<{ styles: Record<string, string> }>(['get', 'styles'], [selector]);
+      return styles;
+    },
+    cdpUrl: async () => {
+      const { cdpUrl } = await this.exec<{ cdpUrl: string }>(['get', 'cdp-url']);
+      return cdpUrl;
+    },
   };
 
   // -- Check State --
 
   is: T.IsActions = {
-    visible: (selector: string) => this.exec<T.VisibleResult>(['is', 'visible'], [selector]),
-    enabled: (selector: string) => this.exec<T.EnabledResult>(['is', 'enabled'], [selector]),
-    checked: (selector: string) => this.exec<T.CheckedResult>(['is', 'checked'], [selector]),
+    visible: async (selector: string) => {
+      const { visible } = await this.exec<{ visible: boolean; origin: string }>(['is', 'visible'], [selector]);
+      return visible;
+    },
+    enabled: async (selector: string) => {
+      const { enabled } = await this.exec<{ enabled: boolean; origin: string }>(['is', 'enabled'], [selector]);
+      return enabled;
+    },
+    checked: async (selector: string) => {
+      const { checked } = await this.exec<{ checked: boolean; origin: string }>(['is', 'checked'], [selector]);
+      return checked;
+    },
   };
 
   // -- Find Elements --
@@ -203,7 +258,10 @@ export class Browser {
   // -- Mouse --
 
   mouse: T.MouseActions = {
-    move: (x: number, y: number) => this.exec<T.MouseMoveResult>(['mouse', 'move'], [String(x), String(y)]),
+    move: async (x: number, y: number) => {
+      const { moved } = await this.exec<{ moved: boolean }>(['mouse', 'move'], [String(x), String(y)]);
+      return moved;
+    },
     down: (button?: T.MouseButton) => {
       const args = button ? [button] : [];
       return this.exec<T.MouseButtonResult>(['mouse', 'down'], args);
@@ -227,45 +285,60 @@ export class Browser {
     },
     device: (name: string) => this.exec<T.DeviceResult>(['set', 'device'], [name]),
     geo: (lat: number, lng: number) => this.exec<T.GeoResult>(['set', 'geo'], [String(lat), String(lng)]),
-    offline: (on?: boolean) => {
+    offline: async (on?: boolean) => {
       const args = on !== undefined ? [on ? 'on' : 'off'] : [];
-      return this.exec<T.OfflineResult>(['set', 'offline'], args);
+      const { offline } = await this.exec<{ offline: boolean }>(['set', 'offline'], args);
+      return offline;
     },
-    headers: (json: string) => this.exec<T.SetResult>(['set', 'headers'], [json]),
-    credentials: (user: string, pass: string) => this.exec<T.SetResult>(['set', 'credentials'], [user, pass]),
-    media: (colorScheme?: 'dark' | 'light', reducedMotion?: boolean) => {
+    headers: async (json: string) => {
+      const { set } = await this.exec<{ set: boolean }>(['set', 'headers'], [json]);
+      return set;
+    },
+    credentials: async (user: string, pass: string) => {
+      const { set } = await this.exec<{ set: boolean }>(['set', 'credentials'], [user, pass]);
+      return set;
+    },
+    media: async (colorScheme?: 'dark' | 'light', reducedMotion?: boolean) => {
       const args: string[] = [];
       if (colorScheme) args.push(colorScheme);
       if (reducedMotion) args.push('reduced-motion');
-      return this.exec<T.SetResult>(['set', 'media'], args);
+      const { set } = await this.exec<{ set: boolean }>(['set', 'media'], args);
+      return set;
     },
   };
 
   // -- Network --
 
   network: T.NetworkActions = {
-    route: (url: string, options?: T.NetworkRouteOptions) =>
-      this.exec<T.RouteResult>(['network', 'route'], [url], options as Record<string, unknown>),
-    unroute: (url?: string) => {
+    route: async (url: string, options?: T.NetworkRouteOptions) => {
+      const { routed } = await this.exec<{ routed: string }>(['network', 'route'], [url], options as Record<string, unknown>);
+      return routed;
+    },
+    unroute: async (url?: string) => {
       const args = url ? [url] : [];
-      return this.exec<T.UnrouteResult>(['network', 'unroute'], args);
+      const { unrouted } = await this.exec<{ unrouted: string }>(['network', 'unroute'], args);
+      return unrouted;
     },
     requests: (options?: T.NetworkRequestsOptions) =>
-      this.exec<T.TrackedRequest[]>(['network', 'requests'], [], options as Record<string, unknown>),
-    request: (requestId: string) => this.exec(['network', 'request'], [requestId]),
-    har: (action: 'start' | 'stop', path?: string) => {
-      const args = path ? [action, path] : [action];
-      return this.exec(['network', 'har'], args);
-    },
+      this.exec<T.RequestsResult>(['network', 'requests'], [], options as Record<string, unknown>),
+    request: (requestId: string) => this.exec<T.RequestDetailResult>(['network', 'request'], [requestId]),
   };
 
   // -- Cookies --
 
   cookies: T.CookieActions = {
-    get: () => this.exec<T.CookiesGetResult>(['cookies', 'get']),
-    set: (name: string, value: string, options?: T.CookieSetOptions) =>
-      this.exec<T.SetResult>(['cookies', 'set'], [name, value], options as Record<string, unknown>),
-    clear: () => this.exec<T.CookiesClearResult>(['cookies', 'clear']),
+    get: async () => {
+      const { cookies } = await this.exec<{ cookies: T.Cookie[] }>(['cookies', 'get']);
+      return cookies;
+    },
+    set: async (name: string, value: string, options?: T.CookieSetOptions) => {
+      const { set } = await this.exec<{ set: boolean }>(['cookies', 'set'], [name, value], options as Record<string, unknown>);
+      return set;
+    },
+    clear: async () => {
+      const { cleared } = await this.exec<{ cleared: boolean }>(['cookies', 'clear']);
+      return cleared;
+    },
   };
 
   // -- Storage --
@@ -276,25 +349,38 @@ export class Browser {
         const args = key ? ['local', 'get', key] : ['local'];
         return this.exec<T.StorageGetResult>(['storage', ...args]);
       },
-      set: (key: string, value: string) =>
-        this.exec<T.StorageSetResult>(['storage', 'local', 'set'], [key, value]),
-      clear: () => this.exec<T.StorageClearResult>(['storage', 'local', 'clear']),
+      set: async (key: string, value: string) => {
+        const { set } = await this.exec<{ set: boolean }>(['storage', 'local', 'set'], [key, value]);
+        return set;
+      },
+      clear: async () => {
+        const { cleared } = await this.exec<{ cleared: boolean }>(['storage', 'local', 'clear']);
+        return cleared;
+      },
     },
     session: {
       get: (key?: string) => {
         const args = key ? ['session', 'get', key] : ['session'];
         return this.exec<T.StorageGetResult>(['storage', ...args]);
       },
-      set: (key: string, value: string) =>
-        this.exec<T.StorageSetResult>(['storage', 'session', 'set'], [key, value]),
-      clear: () => this.exec<T.StorageClearResult>(['storage', 'session', 'clear']),
+      set: async (key: string, value: string) => {
+        const { set } = await this.exec<{ set: boolean }>(['storage', 'session', 'set'], [key, value]);
+        return set;
+      },
+      clear: async () => {
+        const { cleared } = await this.exec<{ cleared: boolean }>(['storage', 'session', 'clear']);
+        return cleared;
+      },
     },
   };
 
   // -- Tabs --
 
   tab: T.TabActions = {
-    list: () => this.exec<T.TabListResult>(['tab', 'list']),
+    list: async () => {
+      const { tabs } = await this.exec<{ tabs: T.TabInfo[] }>(['tab', 'list']);
+      return tabs;
+    },
     new: (url?: string, options?: T.TabNewOptions) => {
       const args = url ? [url] : [];
       return this.exec<T.TabNewResult>(['tab', 'new'], args, options as Record<string, unknown>);
@@ -320,8 +406,14 @@ export class Browser {
   // -- Keyboard --
 
   keyboard: T.KeyboardActions = {
-    type: (text: string) => this.exec<T.KeyboardTypeResult>(['keyboard', 'type'], [text]),
-    insertText: (text: string) => this.exec<T.InsertTextResult>(['keyboard', 'inserttext'], [text]),
+    type: async (text: string) => {
+      const { typed } = await this.exec<{ typed: string }>(['keyboard', 'type'], [text]);
+      return typed;
+    },
+    insertText: async (text: string) => {
+      const { inserted } = await this.exec<{ inserted: boolean }>(['keyboard', 'inserttext'], [text]);
+      return inserted;
+    },
   };
 
 
@@ -334,27 +426,28 @@ export class Browser {
   }
 
   /** View JavaScript errors and uncaught exceptions. */
-  async errors(clear?: boolean): Promise<T.ErrorsResult> {
+  async errors(clear?: boolean): Promise<T.ErrorEntry[]> {
     const options = clear ? { clear: true } : undefined;
-    return this.exec<T.ErrorsResult>(['errors'], [], options);
+    const { errors } = await this.exec<{ errors: T.ErrorEntry[] }>(['errors'], [], options);
+    return errors;
   }
 
   /** Visually highlight an element on the page for debugging. */
-  async highlight(selector: string): Promise<T.HighlightResult> {
-    return this.exec<T.HighlightResult>(['highlight'], [selector]);
+  async highlight(selector: string): Promise<string> {
+    const { highlighted } = await this.exec<{ highlighted: string }>(['highlight'], [selector]);
+    return highlighted;
   }
-
 
   // -- Confirmation --
 
   /** Approve a pending action. */
-  async confirm(id: string): Promise<T.ConfirmResult> {
-    return this.exec<T.ConfirmResult>(['confirm'], [id]);
+  async confirm(id: string): Promise<void> {
+    await this.exec<unknown>(['confirm'], [id]);
   }
 
   /** Deny a pending action. */
-  async deny(id: string): Promise<T.DenyResult> {
-    return this.exec<T.DenyResult>(['deny'], [id]);
+  async deny(id: string): Promise<void> {
+    await this.exec<unknown>(['deny'], [id]);
   }
 
 
