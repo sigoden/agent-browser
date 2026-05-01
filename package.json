@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "build:watch": "tsc --watch",
-    "test": "node --import=tsx --test **/*.test.ts"
+    "build:watch": "tsc --watch"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
