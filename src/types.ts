@@ -261,7 +261,7 @@ export interface BoxResult { x: number; y: number; width: number; height: number
 export interface ViewportResult { width: number; height: number; deviceScaleFactor: number; mobile: boolean; }
 export interface DeviceResult { device: string; width: number; height: number; deviceScaleFactor: number; mobile: boolean; }
 export interface GeoResult { latitude: number; longitude: number; }
-export interface RequestsResult { cleared: boolean; requests: TrackedRequest[]; }
+export type RequestsResult = { cleared: boolean; } | { requests: TrackedRequest[]; }
 export type RequestDetailResult = TrackedRequest & { responseBody: unknown; };
 
 export type StorageGetResult = { key: string; value: string; } | { data: Record<string, string> };
@@ -277,6 +277,7 @@ export interface DiffUrlResult { diff: string; url1: string; url2: string; snaps
 export type MouseButtonResult = { pressed: boolean; } | { released: boolean; }
 export interface WheelResult { scrolled: boolean; deltaX: number; deltaY: number; }
 
+export type ConsoleResult = { cleared: boolean } | { messages: ConsoleEntry[] };
 
 // Sub-object action types (with reserved-word-friendly keys)
 
@@ -434,6 +435,17 @@ export interface KeyboardActions {
   insertText(text: string): Promise<boolean>;
 }
 
+export interface ClipboardActions {
+  /** Read text from the browser clipboard. */
+  read(): Promise<string>;
+  /** Write text to the browser clipboard. */
+  write(text: string): Promise<string>;
+  /** Copy the current selection (Ctrl+C / Cmd+C). */
+  copy(): Promise<boolean>;
+  /** Paste from clipboard (Ctrl+V / Cmd+V). */
+  paste(): Promise<boolean>;
+}
+
 
 // =========================================================================
 // Sub-types used in result types
@@ -501,4 +513,10 @@ export interface TrackedRequest {
   status?: number;
   responseHeaders?: Record<string, unknown>;
   mimeType?: string;
+}
+
+export interface ConsoleEntry {
+  type: string;
+  text: string;
+  args: unknown[];
 }

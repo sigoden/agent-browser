@@ -206,6 +206,12 @@ export class Browser {
     return url;
   }
 
+  /** Push a URL to the browser history (works with React SPAs). */
+  async pushstate(url: string): Promise<string> {
+    const { url: newUrl } = await this.exec<{ url: string }>(['pushstate'], [], { url });
+    return newUrl;
+  }
+
   // -- Get Info --
 
   get: T.GetActions = {
@@ -483,10 +489,45 @@ export class Browser {
   };
 
 
+  // -- Clipboard --
+
+  clipboard: T.ClipboardActions = {
+    read: async () => {
+      const { text } = await this.exec<{ text: string }>(['clipboard', 'read']);
+      return text;
+    },
+    write: async (text: string) => {
+      const { written } = await this.exec<{ written: string }>(['clipboard', 'write'], [text]);
+      return written;
+    },
+    copy: async () => {
+      const { copied } = await this.exec<{ copied: boolean }>(['clipboard', 'copy']);
+      return copied;
+    },
+    paste: async () => {
+      const { pasted } = await this.exec<{ pasted: boolean }>(['clipboard', 'paste']);
+      return pasted;
+    },
+  };
+
+  // -- Frame --
+
+  /** Switch to an iframe by selector, name, or URL. */
+  async frame(selector: string): Promise<string> {
+    const { frame } = await this.exec<{ frame: string }>(['frame'], [selector]);
+    return frame;
+  }
+
+  /** Switch back to the main (top-level) frame. */
+  async mainframe(): Promise<void> {
+    await this.exec(['mainframe']);
+  }
+
+
   // -- Debug --
 
   /** View browser console output (log, warn, error, info). */
-  async console(clear?: boolean): Promise<unknown> {
+  async console(clear?: boolean): Promise<T.ConsoleResult> {
     const options = clear ? { clear: true } : undefined;
     return this.exec(['console'], [], options);
   }
