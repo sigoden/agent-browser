@@ -16,16 +16,15 @@ import type {
  * translated to CLI flags via camelCase-to-kebab-case conversion.
  */
 export class Browser {
-  private globalOptions: Record<string, unknown>;
+  globalOptions: BrowserOptions;
 
   /** @param options - Global options applied to every command. */
-  constructor(options?: BrowserOptions) {
-    this.globalOptions = { ...options } as Record<string, unknown>;
+  constructor(options: BrowserOptions = {}) {
+    this.globalOptions = options;
   }
 
   private async exec(command: string[], args: string[] = [], options?: Record<string, unknown>): Promise<string> {
-    const merged = { ...this.globalOptions, ...options };
-    return delegate(command, args, merged);
+    return delegate(command, args, this.globalOptions as Record<string, unknown>, options);
   }
 
   // -- Core Commands --

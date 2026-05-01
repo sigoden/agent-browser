@@ -22,12 +22,13 @@ function toCliOptions(options: Record<string, unknown> | undefined): string[] {
 export async function delegate(
   command: string[],
   args: string[],
+  globalOptions: Record<string, unknown>,
   options?: Record<string, unknown>,
 ): Promise<string> {
-  const allArgs = [...command, ...args, ...toCliOptions(options)];
+  const allArgs = ['agent-browser', ...toCliOptions(globalOptions), ...command, ...args, ...toCliOptions(options)];
 
   return new Promise<string>((resolve, reject) => {
-    const child = spawn('npx', ['agent-browser', ...allArgs], {
+    const child = spawn('npx', allArgs, {
       stdio: ['inherit', 'pipe', 'pipe'],
       shell: false,
     });
