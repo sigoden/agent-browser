@@ -1,11 +1,32 @@
 {
-  "name": "@sigoden/agent-browser",
+  "name": "@sigodenjs/agent-browser",
   "version": "0.1.0",
-  "private": true,
+  "description": "A typed TypeScript wrapper around the agent-browser CLI",
   "type": "module",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "agent-browser",
+    "browser-automation"
+  ],
+  "author": "Sigoden Huang <sigoden@gmail.com>",
+  "homepage": "https://github.com/sigoden/agent-browser",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sigoden/agent-browser.git"
+  },
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "build:watch": "tsc --watch"
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run -s clean && npm run -s build"
   },
   "dependencies": {
     "agent-browser": "^0.26.0"
