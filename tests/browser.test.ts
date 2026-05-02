@@ -11,11 +11,20 @@ function shouldSkip() {
   return false;
 }
 
-describe('Browser', { skip: shouldSkip()}, () => {
+describe('Browser', { skip: shouldSkip() }, () => {
   const browser = new Browser();
   test('goto', async () => {
     await browser.goto('https://agent-browser.dev/');
     const url = await browser.get.url();
     assert.strictEqual(url, 'https://agent-browser.dev/');
+  });
+  test('batch', async () => {
+    const results = await browser.batch([
+      ['open', 'https://agent-browser.dev/'],
+      ['snapshot', '-i'],
+      ['click', '@e1']
+    ]);
+    assert.strictEqual(results.length, 3);
+    assert.deepStrictEqual(results[2].result, { clicked: '@e1' });
   });
 });

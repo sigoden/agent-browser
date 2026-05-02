@@ -279,6 +279,8 @@ export interface WheelResult { scrolled: boolean; deltaX: number; deltaY: number
 
 export type ConsoleResult = { cleared: boolean } | { messages: ConsoleEntry[] };
 
+export interface BatchOutput { success: boolean, error: string | null, command: string[], result: unknown; }
+
 // Sub-object action types (with reserved-word-friendly keys)
 
 export interface GetActions {
