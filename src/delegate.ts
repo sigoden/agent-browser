@@ -1,24 +1,5 @@
 import { spawn } from 'node:child_process';
 
-function toCliOptions(options: Record<string, unknown> | undefined): string[] {
-  if (!options) return [];
-  const result: string[] = [];
-  for (const [key, value] of Object.entries(options)) {
-    if (value === undefined || value === null) continue;
-    const flag = key.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
-    if (typeof value === 'boolean') {
-      result.push(value ? `--${flag}` : `--no-${flag}`);
-    } else if (Array.isArray(value)) {
-      for (const item of value) {
-        result.push(`--${flag}`, String(item));
-      }
-    } else {
-      result.push(`--${flag}`, String(value));
-    }
-  }
-  return result;
-}
-
 export async function delegate(
   command: string[],
   args: string[],
@@ -26,10 +7,10 @@ export async function delegate(
   options?: Record<string, unknown>,
 ): Promise<string> {
   const mergedOptions = { ...options, json: true };
-  const allArgs = ['agent-browser', ...toCliOptions(globalOptions), ...command, ...args, ...toCliOptions(mergedOptions)];
+  const allArgs = [...toCliOptions(globalOptions), ...command, ...args, ...toCliOptions(mergedOptions)];
 
   return new Promise<string>((resolve, reject) => {
-    const child = spawn('npx', allArgs, {
+    const child = spawn('agent-browser', allArgs, {
       stdio: ['inherit', 'pipe', 'pipe'],
       shell: false,
     });
@@ -57,4 +38,23 @@ export async function delegate(
       reject(new Error(`Failed to spawn agent-browser: ${err.message}`));
     });
   });
+}
+
+export function toCliOptions(options: Record<string, unknown> | undefined): string[] {
+  if (!options) return [];
+  const result: string[] = [];
+  for (const [key, value] of Object.entries(options)) {
+    if (value === undefined || value === null) continue;
+    const flag = key.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
+    if (typeof value === 'boolean') {
+      result.push(value ? `--${flag}` : `--no-${flag}`);
+    } else if (Array.isArray(value)) {
+      for (const item of value) {
+        result.push(`--${flag}`, String(item));
+      }
+    } else {
+      result.push(`--${flag}`, String(value));
+    }
+  }
+  return result;
 }

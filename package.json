@@ -1,11 +1,14 @@
 {
-  "name": "my-browser",
+  "name": "@sigoden/agent-browser",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch"
+  },
+  "dependencies": {
+    "agent-browser": "^0.26.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
