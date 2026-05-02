@@ -1,5 +1,9 @@
 # @sigodenjs/agent-browser
 
+[![CI](https://github.com/sigoden/agent-browser/actions/workflows/ci.yaml/badge.svg)](https://github.com/sigoden/agent-browser/actions/workflows/ci.yaml)
+[![NPM Version](https://img.shields.io/npm/v/@sigodenjs/agent-browser)](https://www.npmjs.com/package/@sigodenjs/agent-browser)
+
+
 A typed TypeScript wrapper around the [`agent-browser`](https://github.com/sigoden/agent-browser) CLI. Provides a clean, object-oriented Browser API that maps each CLI subcommand to a method call.
 
 ## Install
