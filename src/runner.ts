@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import spawn from 'cross-spawn';
 
 export async function runAgentBrowser(
   command: string[],
@@ -14,10 +14,9 @@ export async function runAgentBrowser(
 
 export function spawnAgentBrowser(allArgs: string[]): Promise<string> {
   return new Promise<string>((resolve, reject) => {
-    const isWin = process.platform === 'win32';
-    const child = isWin
-      ? spawn('cmd.exe', ['/c', 'npx', 'agent-browser', ...allArgs], { stdio: ['inherit', 'pipe', 'pipe'] })
-      : spawn('npx', ['agent-browser', ...allArgs], { stdio: ['inherit', 'pipe', 'pipe'] });
+    const child = spawn('agent-browser', allArgs, {
+      stdio: ['inherit', 'pipe', 'pipe'],
+    });
 
     let stdout = '';
     let stderr = '';
