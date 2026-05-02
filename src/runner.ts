@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import spawn from 'cross-spawn';
 
 export async function runAgentBrowser(
   command: string[],
@@ -16,7 +16,6 @@ export function spawnAgentBrowser(allArgs: string[]): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const child = spawn('agent-browser', allArgs, {
       stdio: ['inherit', 'pipe', 'pipe'],
-      shell: false,
     });
 
     let stdout = '';

@@ -26,13 +26,16 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "clean": "rm -rf dist",
+    "test": "node --import=tsx --test **/*.test.ts",
     "prepublishOnly": "npm run -s clean && npm run -s build"
   },
   "dependencies": {
-    "agent-browser": "^0.26.0"
+    "agent-browser": "^0.26.0",
+    "cross-spawn": "^7.0.6"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "^22.19.17",
     "tsx": "^4.21.0",
     "typescript": "^5.7.0"
   }
