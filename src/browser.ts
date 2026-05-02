@@ -1,4 +1,4 @@
-import { delegate } from './delegate.js';
+import { runAgentBrowser } from './runner.js';
 import * as T from './types.js';
 
 /**
@@ -26,7 +26,7 @@ export class Browser {
    * @param options - Per-call options and serialised as CLI flags.
    */
   async exec<T = void>(command: string[], args: string[] = [], options?: Record<string, unknown>): Promise<T> {
-    const raw = await delegate(command, args, this.globalOptions as Record<string, unknown>, options);
+    const raw = await runAgentBrowser(command, args, this.globalOptions as Record<string, unknown>, options);
     const parsed = JSON.parse(raw);
     if (!parsed.success) throw new Error(parsed.error || 'Unknown error');
     return parsed.data as T;

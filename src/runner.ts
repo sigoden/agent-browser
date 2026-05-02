@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 
-export async function delegate(
+export async function runAgentBrowser(
   command: string[],
   args: string[],
   globalOptions: Record<string, unknown>,
@@ -9,6 +9,10 @@ export async function delegate(
   const mergedOptions = { ...options, json: true };
   const allArgs = [...toCliOptions(globalOptions), ...command, ...args, ...toCliOptions(mergedOptions)];
 
+  return spawnAgentBrowser(allArgs);
+}
+
+export function spawnAgentBrowser(allArgs: string[]): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const child = spawn('agent-browser', allArgs, {
       stdio: ['inherit', 'pipe', 'pipe'],
