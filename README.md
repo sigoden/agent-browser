@@ -1,4 +1,4 @@
-# @sigoden/agent-browser
+# @sigodenjs/agent-browser
 
 A typed TypeScript wrapper around the [`agent-browser`](https://github.com/sigoden/agent-browser) CLI. Provides a clean, object-oriented Browser API that maps each CLI subcommand to a method call.
 
