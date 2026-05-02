@@ -14,10 +14,10 @@ export async function runAgentBrowser(
 
 export function spawnAgentBrowser(allArgs: string[]): Promise<string> {
   return new Promise<string>((resolve, reject) => {
-    const child = spawn('npx', ['agent-browser', ...allArgs], {
-      stdio: ['inherit', 'pipe', 'pipe'],
-      shell: false,
-    });
+    const isWin = process.platform === 'win32';
+    const child = isWin
+      ? spawn('cmd.exe', ['/c', 'npx', 'agent-browser', ...allArgs], { stdio: ['inherit', 'pipe', 'pipe'] })
+      : spawn('npx', ['agent-browser', ...allArgs], { stdio: ['inherit', 'pipe', 'pipe'] });
 
     let stdout = '';
     let stderr = '';
