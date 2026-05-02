@@ -141,19 +141,19 @@ export class Browser {
    *   browser.wait({ fn: "window.appReady === true" })
    *   browser.wait({ text: "Welcome back" })
    */
-  async wait(selectorOrMs?: string | number | T.WaitOptions): Promise<T.WaitResult> {
+  async wait(options?: string | number | T.WaitOptions): Promise<T.WaitResult> {
     const args: string[] = [];
     let opts: Record<string, unknown> = {};
 
-    if (typeof selectorOrMs === 'object') {
-      if (Object.keys(selectorOrMs).length === 1 && 'timeout' in selectorOrMs) {
-        args.push(String(selectorOrMs.timeout));
+    if (typeof options === 'object') {
+      if (Object.keys(options).length === 1 && 'timeout' in options) {
+        args.push(String(options.timeout));
       } else {
-        opts = selectorOrMs as Record<string, unknown>;
+        opts = options as Record<string, unknown>;
       }
     } else {
-      if (selectorOrMs !== undefined) {
-        args.push(String(selectorOrMs));
+      if (options !== undefined) {
+        args.push(String(options));
       }
     }
 
@@ -161,9 +161,10 @@ export class Browser {
   }
 
   /** Take a screenshot. Returns the path to the saved image. */
-  async screenshot(path?: string, options?: T.ScreenshotOptions): Promise<T.ScreenshotResult> {
+  async screenshot(options?: T.ScreenshotOptions): Promise<T.ScreenshotResult> {
+    const { path, ...extra } = options || {};
     const args = path ? [path] : [];
-    return this.exec<T.ScreenshotResult>(['screenshot'], args, options as Record<string, unknown>);
+    return this.exec<T.ScreenshotResult>(['screenshot'], args, extra as Record<string, unknown>);
   }
 
   /** Save the page as PDF. */
