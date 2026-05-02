@@ -1,3 +1,4 @@
+import { quote } from 'shell-quote';
 import { runAgentBrowser } from './runner.js';
 import * as T from './types.js';
 
@@ -28,6 +29,7 @@ export class Browser {
   async exec<T = void>(command: string[], args: string[] = [], options?: Record<string, unknown>): Promise<T> {
     const raw = await runAgentBrowser(command, args, this.globalOptions as Record<string, unknown>, options);
     const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed as unknown as T;
     if (!parsed.success) throw new Error(parsed.error || 'Unknown error');
     return parsed.data as T;
   }
@@ -566,12 +568,23 @@ export class Browser {
     await this.exec<unknown>(['deny'], [id]);
   }
 
-
   // -- Batch --
 
-  /** Execute multiple commands sequentially. */
-  async batch(commands: string[], options?: T.BatchOptions): Promise<unknown> {
-    return this.exec(['batch'], commands.map(c => `"${c}"`), options as Record<string, unknown>);
+  /**
+   * Execute multiple commands sequentially. 
+   *
+   * Examples:
+   *   const values = await browser.batch(
+   *     [
+   *       ['open', 'https://agent-browser.dev/'],
+   *       ['snapshot', '-i'],
+   *       ['click', '@e1']
+   *     ],
+   *     { bail: true }
+   *   )
+   */
+  async batch(commands: string[][], options?: T.BatchOptions): Promise<T.BatchOutput[]> {
+    return this.exec(['batch'], commands.map(quote), options as Record<string, unknown>);
   }
 }
 
