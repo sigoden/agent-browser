@@ -103,6 +103,8 @@ export interface SnapshotOptions {
 
 /** Options for the `screenshot` command. */
 export interface ScreenshotOptions {
+  /** Output file path */
+  path?: string;
   /** Capture full page (not just viewport) (--full) */
   full?: boolean;
   /** Overlay numbered labels on interactive elements */
