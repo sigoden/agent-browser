@@ -14,7 +14,8 @@ export async function runAgentBrowser(
 
 export function spawnAgentBrowser(allArgs: string[]): Promise<string> {
   return new Promise<string>((resolve, reject) => {
-    const child = spawn('agent-browser', allArgs, {
+    const cmd = process.platform === 'win32' ? 'agent-browser.cmd' : 'agent-browser';
+    const child = spawn(cmd, allArgs, {
       stdio: ['inherit', 'pipe', 'pipe'],
       shell: false,
     });
