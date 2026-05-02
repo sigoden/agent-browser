@@ -16,7 +16,16 @@ export class Browser {
     this.globalOptions = options;
   }
 
-  private async exec<T = void>(command: string[], args: string[] = [], options?: Record<string, unknown>): Promise<T> {
+  /**
+   * Execute an arbitrary `agent-browser` command and return the parsed result.
+   *
+   * Use this as an escape hatch for commands not yet wrapped by the typed API.
+   *
+   * @param command - Command tokens (e.g. `['network', 'route']`).
+   * @param args    - Positional arguments passed after the command.
+   * @param options - Per-call options and serialised as CLI flags.
+   */
+  async exec<T = void>(command: string[], args: string[] = [], options?: Record<string, unknown>): Promise<T> {
     const raw = await delegate(command, args, this.globalOptions as Record<string, unknown>, options);
     const parsed = JSON.parse(raw);
     if (!parsed.success) throw new Error(parsed.error || 'Unknown error');
